@@ -1,0 +1,301 @@
+
+!
+! Last configuration change at 18:52:27 +0330 Sat Dec 7 2019
+!
+version 15.7
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SP-R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition CustA
+ rd 10000:20
+ !
+ address-family ipv4
+  route-target export 10000:20
+  route-target import 10000:20
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+clock timezone +0330 3 30
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+mpls label range 106000 106999
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 169.255.255.6 255.255.255.255
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.0.0.6 255.255.255.0
+ duplex auto
+!
+interface Ethernet0/1
+ no shutdown
+ vrf forwarding CustA
+ ip address 10.6.17.6 255.255.255.0
+ duplex auto
+!
+interface Ethernet0/2
+ no shutdown
+ vrf forwarding CustA
+ ip address 10.6.18.6 255.255.255.0
+ duplex auto
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet1/0
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet1/1
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet2/0
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet2/1
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet2/2
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet2/3
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet3/0
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet3/1
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet3/2
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet3/3
+ no shutdown
+ no ip address
+ shutdown
+ duplex auto
+!
+router ospf 10000
+ mpls ldp autoconfig
+ router-id 169.255.255.6
+ prefix-suppression
+ passive-interface default
+ no passive-interface Ethernet0/0
+ network 10.0.0.0 0.0.0.255 area 0
+ network 169.255.255.6 0.0.0.0 area 0
+!
+router bgp 10000
+ bgp cluster-id 169.255.255.6
+ bgp log-neighbor-changes
+ bgp bestpath med missing-as-worst
+ no bgp default ipv4-unicast
+ neighbor 169.255.255.1 remote-as 10000
+ neighbor 169.255.255.1 update-source Loopback0
+ neighbor 169.255.255.2 remote-as 10000
+ neighbor 169.255.255.2 update-source Loopback0
+ neighbor 169.255.255.3 remote-as 10000
+ neighbor 169.255.255.3 update-source Loopback0
+ neighbor 169.255.255.4 remote-as 10000
+ neighbor 169.255.255.4 update-source Loopback0
+ neighbor 169.255.255.5 remote-as 10000
+ neighbor 169.255.255.5 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 169.255.255.1 activate
+  neighbor 169.255.255.1 send-community extended
+  neighbor 169.255.255.2 activate
+  neighbor 169.255.255.2 send-community extended
+  neighbor 169.255.255.2 route-reflector-client
+  neighbor 169.255.255.3 activate
+  neighbor 169.255.255.3 send-community extended
+  neighbor 169.255.255.3 route-reflector-client
+  neighbor 169.255.255.4 activate
+  neighbor 169.255.255.4 send-community extended
+  neighbor 169.255.255.4 route-reflector-client
+  neighbor 169.255.255.5 activate
+  neighbor 169.255.255.5 send-community extended
+  neighbor 169.255.255.5 route-reflector-client
+ exit-address-family
+ !
+ address-family ipv4 vrf CustA
+  neighbor 10.6.17.17 remote-as 65020
+  neighbor 10.6.17.17 activate
+  neighbor 10.6.17.17 as-override split-horizon
+  neighbor 10.6.17.17 soo 65020:1718
+  neighbor 10.6.18.18 remote-as 65020
+  neighbor 10.6.18.18 activate
+  neighbor 10.6.18.18 as-override split-horizon
+  neighbor 10.6.18.18 soo 65020:1718
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 ioam timestamp
+!
+!
+mpls ldp router-id Loopback0
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 26
+ width 133
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+banner exec ^C
+***********************************************************************************
+* BGP L3VPN (Private-AS and all options!)                                         *
+* Copyright (C) 2019  Navid Yahyapour (NMAXi)                                     *
+* This configuration file is free: you can redistribute it and/or modify it.      *
+* This config file is distributed in the hope that it will be useful, but WITHOUT *
+* ANY WARRANTY; Without even the implied warranty of MERCHANTABILITY or FITNESS   *
+* FOR A PARTICULAR PURPOSE. (The same as GNU General Public License!)             * 
+* My LinkedIn profile:  <https://www.linkedin.com/in/navid-yahyapour/>.           *
+***********************************************************************************^C
+banner incoming ^C
+***********************************************************************************
+* BGP L3VPN (Private-AS and all options!)                                         *
+* Copyright (C) 2019  Navid Yahyapour (NMAXi)                                     *
+* This configuration file is free: you can redistribute it and/or modify it.      *
+* This config file is distributed in the hope that it will be useful, but WITHOUT *
+* ANY WARRANTY; Without even the implied warranty of MERCHANTABILITY or FITNESS   *
+* FOR A PARTICULAR PURPOSE. (The same as GNU General Public License!)             * 
+* My LinkedIn profile:  <https://www.linkedin.com/in/navid-yahyapour/>.           *
+***********************************************************************************^C
+banner login ^C
+***********************************************************************************
+* BGP L3VPN (Private-AS and all options!)                                         *
+* Copyright (C) 2019  Navid Yahyapour (NMAXi)                                     *
+* This configuration file is free: you can redistribute it and/or modify it.      *
+* This config file is distributed in the hope that it will be useful, but WITHOUT *
+* ANY WARRANTY; Without even the implied warranty of MERCHANTABILITY or FITNESS   *
+* FOR A PARTICULAR PURPOSE. (The same as GNU General Public License!)             * 
+* My LinkedIn profile:  <https://www.linkedin.com/in/navid-yahyapour/>.           *
+***********************************************************************************^C
+!
+end
